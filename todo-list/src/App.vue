@@ -5,21 +5,31 @@
 
         <ul>
             <li v-for='item in items' :class='{finished:item.isFinished}' @click='toggleFinished(item)'>
-                <span class="tick">√</span>
-                {{item.label}}
-                <button @click='rmCurrent($event)'>×</button>
+                <span class="content-wrap">
+                    <span class="tick">√</span>
+                    {{item.label}}
+                    <button @click='rmCurrent($event)'>×</button>
+                </span>
             </li>
         </ul>
   </div>
 </template>
 
 <script>
+    import Store from './store';
+
     export default {
         data: function(){
             return {
-                items:[],
+                items:Store.fetch(),//将local storage里已存在的JSON字符串解析为JS对象添加到页面里
                 inputVal:''
             }
+        },
+        watch:{
+            items:function(items){
+                Store.save(items);//将items数组序列化为JSON字符串保存到浏览器的一个文件中
+            },
+            deep:true
         },
         methods:{
             toggleFinished:function(obj){
@@ -56,16 +66,12 @@
     }
 
     [type='text']{
-        position: relative;
-        left: 2.8em;
-
         width: 8em;
         height: 2em;
         padding-left: .5em;
     }
 
     .demonstrate{
-        padding-left: 4.2em;
         color: #ccc;
     }
 
@@ -74,21 +80,22 @@
     }
 
     ul li{
-        position: relative;
-        width: 8em;
         height: 3em;
         line-height: 3em;
         margin: 0 auto;
         color: #ccc;
     }
 
+    .content-wrap{
+        position: relative;
+        right: 1.2em;
+    }
+
     ul li .tick{
-        display: none;
-        position: absolute;
+        opacity: 0;
         left: 1.5em;
     }
     ul li button{
-        position: absolute;
         right: 0;
         top: 13px;
         right: 8px;
@@ -100,6 +107,6 @@
     }
 
     .finished .tick{
-        display: inline-block;
+        opacity: 1;
     }
 </style>
